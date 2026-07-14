@@ -1,0 +1,2472 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineStream — Entertainment Hub</title>
+    <meta name="description" content="CineStream Entertainment Hub — ดูหนัง เล่นมินิเกม ใช้ฟีเจอร์สุดเจ๋ง ครบในที่เดียว">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-deep: #0a0a0f;
+            --bg-surface: #111118;
+            --bg-card: rgba(20, 20, 35, 0.7);
+            --border-glass: rgba(255,255,255,0.07);
+            --neon-red: #ff2d55;
+            --neon-red-glow: rgba(255,45,85,0.35);
+            --neon-cyan: #00d4ff;
+            --neon-cyan-glow: rgba(0,212,255,0.3);
+            --neon-purple: #a855f7;
+            --neon-purple-glow: rgba(168,85,247,0.3);
+            --neon-green: #22c55e;
+            --neon-gold: #fbbf24;
+            --text-primary: #f0f0f5;
+            --text-secondary: #c0c0d0;
+            --text-muted: #6b6b8a;
+            --sidebar-width: 260px;
+            --sidebar-collapsed: 72px;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ====== SIDEBAR ====== */
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: rgba(12, 12, 20, 0.95);
+            backdrop-filter: blur(30px);
+            border-right: 1px solid var(--border-glass);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-height: 80px;
+        }
+
+        .sidebar-logo {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 1.4em;
+            background: linear-gradient(135deg, var(--neon-red), #ff6b8a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            white-space: nowrap;
+        }
+
+        .sidebar .collapse-btn {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.3em;
+            padding: 6px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar .collapse-btn:hover {
+            background: rgba(255,255,255,0.06);
+            color: var(--text-primary);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-section-title {
+            font-size: 0.65em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            padding: 12px 14px 8px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.25s ease;
+            white-space: nowrap;
+            margin-bottom: 2px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(255,45,85,0.15), rgba(168,85,247,0.1));
+            color: var(--neon-red);
+            font-weight: 600;
+        }
+
+        .nav-item .nav-icon {
+            font-size: 1.2em;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border-glass);
+        }
+
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .user-avatar {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--neon-red), var(--neon-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .user-info .name {
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        .user-info .role {
+            font-size: 0.7em;
+            color: var(--neon-cyan);
+        }
+
+        .logout-btn-sidebar {
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+            background: rgba(255,45,85,0.1);
+            border: 1px solid rgba(255,45,85,0.2);
+            color: var(--neon-red);
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82em;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .logout-btn-sidebar:hover {
+            background: rgba(255,45,85,0.2);
+        }
+
+        /* ====== MAIN CONTENT ====== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed);
+        }
+
+        /* ====== TOP BAR ====== */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 18px 32px;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-glass);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 0.78em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-badge.active {
+            background: rgba(34, 197, 94, 0.12);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            color: var(--neon-green);
+        }
+
+        .status-badge.expired {
+            background: rgba(255, 45, 85, 0.12);
+            border: 1px solid rgba(255, 45, 85, 0.25);
+            color: var(--neon-red);
+        }
+
+        .theme-toggle {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-glass);
+            color: var(--text-muted);
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--neon-gold);
+        }
+
+        /* ====== SECTIONS / PAGES ====== */
+        .page-section {
+            display: none;
+            padding: 32px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ====== SECTION HEADER ====== */
+        .section-header {
+            margin-bottom: 28px;
+        }
+
+        .section-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8em;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        /* ====== GLASS CARD ====== */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.35s ease;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255,255,255,0.12);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        /* ====== GRID LAYOUTS ====== */
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+
+        /* ====== WELCOME CARD / OVERVIEW ====== */
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(255,45,85,0.15), rgba(168,85,247,0.1), rgba(0,212,255,0.08));
+            border: 1px solid rgba(255,45,85,0.15);
+            border-radius: 24px;
+            padding: 32px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--neon-red-glow), transparent 70%);
+            filter: blur(60px);
+            pointer-events: none;
+        }
+
+        .welcome-avatar-lg {
+            width: 80px; height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--neon-red), var(--neon-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            font-weight: 900;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-text h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6em;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .welcome-text p {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.35s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255,255,255,0.12);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 1.6em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8em;
+            font-weight: 800;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.78em;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* Progress bar */
+        .progress-wrap {
+            margin-top: 12px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 50px;
+            overflow: hidden;
+        }
+
+        .progress-bar .fill {
+            height: 100%;
+            border-radius: 50px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+            transition: width 1s ease;
+        }
+
+        .progress-text {
+            font-size: 0.72em;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        /* ====== MOVIE SECTION ====== */
+        .movie-category {
+            margin-bottom: 32px;
+        }
+
+        .movie-category h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .movie-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(255,45,85,0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px var(--neon-red-glow);
+        }
+
+        .movie-poster {
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .movie-poster .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(10,10,15,0.9), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .movie-card:hover .overlay {
+            opacity: 1;
+        }
+
+        .play-icon {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            background: var(--neon-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            box-shadow: 0 0 25px var(--neon-red-glow);
+            transform: scale(0);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .movie-card:hover .play-icon {
+            transform: scale(1);
+        }
+
+        .movie-info {
+            padding: 16px;
+        }
+
+        .movie-info h4 {
+            font-size: 0.95em;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .movie-info .stars {
+            color: var(--neon-gold);
+            font-size: 0.85em;
+            margin-bottom: 8px;
+        }
+
+        .movie-info .genre-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.68em;
+            background: rgba(168,85,247,0.15);
+            color: var(--neon-purple);
+            font-weight: 600;
+        }
+
+        .watch-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--neon-red), #ff6b8a);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 0.82em;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .watch-btn:hover {
+            box-shadow: 0 4px 20px var(--neon-red-glow);
+            transform: translateY(-2px);
+        }
+
+        /* ====== GAME SECTION ====== */
+        .game-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-red));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .game-card:hover::before {
+            opacity: 1;
+        }
+
+        .game-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0,212,255,0.2);
+            box-shadow: 0 12px 36px rgba(0,0,0,0.3);
+        }
+
+        .game-icon {
+            font-size: 3em;
+            margin-bottom: 14px;
+            display: block;
+        }
+
+        .game-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1em;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .game-card p {
+            font-size: 0.78em;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .game-play-btn {
+            padding: 10px 28px;
+            border-radius: 50px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 0.82em;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            color: white;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,212,255,0.2);
+        }
+
+        .game-play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(0,212,255,0.35);
+        }
+
+        /* ====== GAME MODAL ====== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-glass);
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px; right: 16px;
+            background: rgba(255,255,255,0.06);
+            border: none;
+            color: var(--text-muted);
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255,45,85,0.15);
+            color: var(--neon-red);
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5em;
+            font-weight: 800;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Game common styles */
+        .game-area {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-glass);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .game-btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .game-btn.primary {
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            color: white;
+        }
+
+        .game-btn.danger {
+            background: linear-gradient(135deg, var(--neon-red), #ff6b8a);
+            color: white;
+        }
+
+        .game-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .game-score {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5em;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--neon-gold), #fde68a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .game-result {
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 16px;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .game-result.win {
+            background: rgba(34,197,94,0.1);
+            border: 1px solid rgba(34,197,94,0.2);
+            color: var(--neon-green);
+        }
+
+        .game-result.lose {
+            background: rgba(255,45,85,0.1);
+            border: 1px solid rgba(255,45,85,0.2);
+            color: var(--neon-red);
+        }
+
+        /* ====== Memory Match Game ====== */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .memory-tile {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(0,212,255,0.15));
+            border: 1.5px solid rgba(168,85,247,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            cursor: pointer;
+            transition: all 0.35s ease;
+            user-select: none;
+        }
+
+        .memory-tile:hover {
+            border-color: rgba(0,212,255,0.4);
+            transform: scale(1.05);
+        }
+
+        .memory-tile.flipped {
+            background: rgba(0,212,255,0.12);
+            border-color: var(--neon-cyan);
+            transform: rotateY(180deg);
+        }
+
+        .memory-tile.matched {
+            background: rgba(34,197,94,0.15);
+            border-color: var(--neon-green);
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        /* ====== Snake Game ====== */
+        #snake-canvas {
+            border-radius: 12px;
+            border: 1px solid var(--border-glass);
+            display: block;
+            margin: 0 auto;
+            background: #0a0a0f;
+        }
+
+        /* ====== RPS Game ====== */
+        .rps-choices {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .rps-btn {
+            width: 90px; height: 90px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.04);
+            border: 2px solid var(--border-glass);
+            font-size: 2.5em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rps-btn:hover {
+            transform: scale(1.12);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px var(--neon-cyan-glow);
+        }
+
+        /* ====== Reaction Speed ====== */
+        .reaction-box {
+            width: 100%;
+            height: 200px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            user-select: none;
+            background: rgba(255,45,85,0.15);
+            border: 2px solid rgba(255,45,85,0.2);
+            color: var(--neon-red);
+        }
+
+        .reaction-box.waiting {
+            background: rgba(255,45,85,0.15);
+            border-color: rgba(255,45,85,0.3);
+            color: var(--neon-red);
+        }
+
+        .reaction-box.ready {
+            background: rgba(34,197,94,0.2);
+            border-color: rgba(34,197,94,0.4);
+            color: var(--neon-green);
+        }
+
+        /* ====== Slot Machine ====== */
+        .slot-display {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .slot-reel {
+            width: 80px; height: 80px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid var(--border-glass);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            transition: all 0.3s;
+        }
+
+        .slot-reel.spinning {
+            animation: slotSpin 0.1s infinite;
+        }
+
+        @keyframes slotSpin {
+            0% { transform: translateY(-3px); }
+            50% { transform: translateY(3px); }
+        }
+
+        /* ====== FEATURE WIDGETS ====== */
+        .widget-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.35s;
+        }
+
+        .widget-card:hover {
+            border-color: rgba(255,255,255,0.12);
+        }
+
+        .widget-header {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1em;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Calculator */
+        .calc-display {
+            width: 100%;
+            text-align: right;
+            padding: 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            outline: none;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .calc-btn {
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.06);
+            color: var(--text-primary);
+        }
+
+        .calc-btn:hover {
+            background: rgba(255,255,255,0.12);
+            transform: scale(1.05);
+        }
+
+        .calc-btn.op {
+            background: rgba(0,212,255,0.12);
+            color: var(--neon-cyan);
+        }
+
+        .calc-btn.eq {
+            background: linear-gradient(135deg, var(--neon-red), #ff6b8a);
+            color: white;
+        }
+
+        .calc-btn.clear {
+            background: rgba(255,45,85,0.12);
+            color: var(--neon-red);
+        }
+
+        /* Notepad */
+        .notepad-area {
+            width: 100%;
+            min-height: 200px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+            padding: 16px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+        }
+
+        .notepad-area:focus {
+            border-color: var(--neon-cyan);
+        }
+
+        .notepad-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .notepad-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .notepad-btn.save {
+            background: rgba(34,197,94,0.15);
+            color: var(--neon-green);
+        }
+
+        .notepad-btn.clear-note {
+            background: rgba(255,45,85,0.12);
+            color: var(--neon-red);
+        }
+
+        /* Timer / Pomodoro */
+        .timer-display {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.5em;
+            font-weight: 900;
+            text-align: center;
+            margin: 20px 0;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Leaderboard */
+        .leaderboard-list {
+            list-style: none;
+        }
+
+        .leaderboard-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            background: rgba(255,255,255,0.03);
+            font-size: 0.88em;
+        }
+
+        .leaderboard-list li:first-child {
+            background: linear-gradient(135deg, rgba(251,191,36,0.1), rgba(251,191,36,0.05));
+            border: 1px solid rgba(251,191,36,0.15);
+        }
+
+        .lb-rank {
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85em;
+            color: var(--neon-gold);
+        }
+
+        .lb-name { flex: 1; font-weight: 600; }
+        .lb-score { color: var(--neon-cyan); font-weight: 700; }
+
+        /* Music Player */
+        .music-mini {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 14px;
+            margin-top: 10px;
+        }
+
+        .music-cover {
+            width: 50px; height: 50px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4em;
+            flex-shrink: 0;
+        }
+
+        .music-info { flex: 1; }
+        .music-info .song { font-weight: 600; font-size: 0.88em; }
+        .music-info .artist { font-size: 0.75em; color: var(--text-muted); }
+
+        .music-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .music-btn {
+            background: rgba(255,255,255,0.06);
+            border: none;
+            color: var(--text-primary);
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .music-btn:hover { background: rgba(255,255,255,0.12); }
+        .music-btn.play-pause { background: var(--neon-red); border-radius: 50%; }
+
+        /* ====== Session Timer ====== */
+        .session-timer {
+            font-size: 0.8em;
+            color: var(--text-muted);
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50px;
+        }
+
+        /* ====== SCROLLBAR ====== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 50px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+        /* ====== RESPONSIVE ====== */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: var(--sidebar-collapsed);
+            }
+            .main-content {
+                margin-left: var(--sidebar-collapsed);
+            }
+            .sidebar-logo, .nav-item span, .nav-section-title,
+            .user-info, .logout-btn-sidebar { display: none; }
+            .page-section { padding: 20px; }
+            .memory-grid { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+            .welcome-banner { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ====== SIDEBAR ====== -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-logo">CineStream</span>
+            <button class="collapse-btn" id="collapseBtn" title="Toggle sidebar">☰</button>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Main</div>
+            <div class="nav-item active" data-page="overview">
+                <span class="nav-icon">🏠</span><span>ภาพรวม</span>
+            </div>
+            <div class="nav-item" data-page="movies">
+                <span class="nav-icon">🎬</span><span>ดูหนัง</span>
+            </div>
+            <div class="nav-item" data-page="games">
+                <span class="nav-icon">🎮</span><span>มินิเกม</span>
+            </div>
+
+            <div class="nav-section-title">Tools</div>
+            <div class="nav-item" data-page="calculator">
+                <span class="nav-icon">🧮</span><span>เครื่องคิดเลข</span>
+            </div>
+            <div class="nav-item" data-page="notepad">
+                <span class="nav-icon">📝</span><span>จดบันทึก</span>
+            </div>
+            <div class="nav-item" data-page="timer">
+                <span class="nav-icon">⏱️</span><span>จับเวลา</span>
+            </div>
+            <div class="nav-item" data-page="music">
+                <span class="nav-icon">🎵</span><span>เพลง</span>
+            </div>
+
+            <div class="nav-section-title">Stats</div>
+            <div class="nav-item" data-page="leaderboard">
+                <span class="nav-icon">🏆</span><span>ลีดเดอร์บอร์ด</span>
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="user-avatar" id="userAvatar">?</div>
+                <div class="user-info">
+                    <div class="name" id="userName">User</div>
+                    <div class="role">Premium Member</div>
+                </div>
+            </div>
+            <button class="logout-btn-sidebar" onclick="logout()">🚪 ออกจากระบบ</button>
+        </div>
+    </aside>
+
+    <!-- ====== MAIN ====== -->
+    <main class="main-content" id="mainContent">
+        <!-- Top Bar -->
+        <div class="topbar">
+            <h1 class="topbar-title" id="pageTitle">🏠 ภาพรวม</h1>
+            <div class="topbar-right">
+                <span class="session-timer" id="sessionTimer">⏱ 00:00:00</span>
+                <div class="status-badge" id="statusBadge">
+                    <span id="statusDot">●</span>
+                    <span id="statusText">ตรวจสอบ...</span>
+                </div>
+                <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+            </div>
+        </div>
+
+        <!-- ======= PAGE: OVERVIEW ======= -->
+        <section class="page-section active" id="page-overview">
+            <div class="welcome-banner">
+                <div class="welcome-avatar-lg" id="welcomeAvatar">?</div>
+                <div class="welcome-text">
+                    <h2 id="welcomeMsg">สวัสดี! 👋</h2>
+                    <p>ยินดีต้อนรับเข้าสู่ CineStream Entertainment Hub — ดูหนัง เล่นเกม ใช้เครื่องมือ ครบจบในที่เดียว!</p>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-value" id="daysLeftValue">—</div>
+                    <div class="stat-label">วันคงเหลือ</div>
+                    <div class="progress-wrap">
+                        <div class="progress-bar"><div class="fill" id="daysProgress" style="width:0%"></div></div>
+                        <div class="progress-text" id="daysProgressText">กำลังคำนวณ...</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎮</div>
+                    <div class="stat-value" id="gamesPlayed">0</div>
+                    <div class="stat-label">เกมที่เล่น</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-value" id="bestScore">0</div>
+                    <div class="stat-label">คะแนนสูงสุด</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎬</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">หนังทั้งหมด</div>
+                </div>
+            </div>
+
+            <div class="grid-3">
+                <div class="glass-card" style="cursor:pointer" onclick="navigateTo('games')">
+                    <h3 style="font-family:'Outfit';font-weight:700;margin-bottom:8px">🎮 เล่นมินิเกม</h3>
+                    <p style="font-size:0.85em;color:var(--text-muted)">6 เกมสนุกๆ รอให้คุณมาลอง — ทายเลข, เป่ายิ้งฉุบ, จับคู่การ์ด และอื่นๆ!</p>
+                </div>
+                <div class="glass-card" style="cursor:pointer" onclick="navigateTo('movies')">
+                    <h3 style="font-family:'Outfit';font-weight:700;margin-bottom:8px">🎬 ดูหนังออนไลน์</h3>
+                    <p style="font-size:0.85em;color:var(--text-muted)">ภาพยนตร์หลากหลายหมวดหมู่ ทั้ง Action, Sci-Fi, Horror พร้อมรับชม!</p>
+                </div>
+                <div class="glass-card" style="cursor:pointer" onclick="navigateTo('calculator')">
+                    <h3 style="font-family:'Outfit';font-weight:700;margin-bottom:8px">🛠️ เครื่องมือ</h3>
+                    <p style="font-size:0.85em;color:var(--text-muted)">เครื่องคิดเลข, จดบันทึก, จับเวลา, เพลง — ครบทุกฟีเจอร์!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======= PAGE: MOVIES ======= -->
+        <section class="page-section" id="page-movies">
+            <div class="section-header">
+                <h2>🎬 ภาพยนตร์</h2>
+                <p>เลือกรับชมภาพยนตร์จากหลากหลายหมวดหมู่</p>
+            </div>
+
+            <div class="movie-category">
+                <h3>🚀 Sci-Fi & อวกาศ</h3>
+                <div class="grid-4">
+                    <div class="movie-card">
+                        <div class="movie-poster" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">🚀
+                            <div class="overlay"><div class="play-icon">▶</div></div>
+                        </div>
+                        <div class="movie-info">
+                            <h4>Space Odyssey</h4>
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                            <span class="genre-tag">Sci-Fi</span>
+                            <button class="watch-btn" onclick="playMovie()">▶ รับชม</button>
+                        </div>
+                    </div>
+                    <div class="movie-card">
+                        <div class="movie-poster" style="background:linear-gradient(135deg,#0f3460,#16213e)">🛸
+                            <div class="overlay"><div class="play-icon">▶</div></div>
+                        </div>
+                        <div class="movie-info">
+                            <h4>Alien Contact</h4>
+                            <div class="stars">⭐⭐⭐⭐</div>
+                            <span class="genre-tag">Sci-Fi</span>
+                            <button class="watch-btn" onclick="playMovie()">▶ รับชม</button>
+                        </div>
+                    </div>
+                    <div class="movie-card">
+                        <div class="movie-poster" style="background:linear-gradient(135deg,#1b1b3a,#2a2a5a)">🌌
+                            <div class="overlay"><div class="play-icon">▶</div></div>
+                        </div>
+                        <div class="movie-info">
+                            <h4>Galaxy War</h4>
+                            <div class="stars">⭐⭐⭐⭐</div>
+                            <span class="genre-tag">Action</span>
+                            <button class="watch-btn" onclick="playMovie()">▶ รับชม</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="movie-category">
+                <h3>🧟 สยองขวัญ & ระทึก</h3>
+                <div class="grid-4">
+                    <div class="movie-card">
+                        <div class="movie-poster" style="background:linear-gradient(135deg,#1a0a0a,#2d1515)">🧟
+                            <div class="overlay"><div class="play-icon">▶</div></div>
+                        </div>
+                        <div class="movie-info">
+                            <h4>Zombie Land</h4>
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                            <span class="genre-tag">Horror</span>
+                            <button class="watch-btn" onclick="playMovie()">▶ รับชม</button>
+                        </div>
+                    </div>
+                    <div class="movie-card">
+                        <div class="movie-poster" style="background:linear-gradient(135deg,#0d0d0d,#1a0a1a)">👻
+                            <div class="overlay"><div class="play-icon">▶</div></div>
+                        </div>
+                        <div class="movie-info">
+                            <h4>The Haunting</h4>
+                            <div class="stars">⭐⭐⭐⭐</div>
+                            <span class="genre-tag">Horror</span>
+                            <button class="watch-btn" onclick="playMovie()">▶ รับชม</button>
+                        </div>
+                    </div>
+                    <div class="movie-card">
+                        <div class="movie-poster" style="background:linear-gradient(135deg,#1a0a0a,#2a0a0a)">🔪
+                            <div class="overlay"><div class="play-icon">▶</div></div>
+                        </div>
+                        <div class="movie-info">
+                            <h4>Dark Night</h4>
+                            <div class="stars">⭐⭐⭐</div>
+                            <span class="genre-tag">Thriller</span>
+                            <button class="watch-btn" onclick="playMovie()">▶ รับชม</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="movie-category">
+                <h3>😂 ตลก & ครอบครัว</h3>
+                <div class="grid-4">
+                    <div class="movie-card">
+                        <div class="movie-poster" style="background:linear-gradient(135deg,#1a1a0a,#2d2d15)">🍿
+                            <div class="overlay"><div class="play-icon">▶</div></div>
+                        </div>
+                        <div class="movie-info">
+                            <h4>Laugh Out Loud</h4>
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                            <span class="genre-tag">Comedy</span>
+                            <button class="watch-btn" onclick="playMovie()">▶ รับชม</button>
+                        </div>
+                    </div>
+                    <div class="movie-card">
+                        <div class="movie-poster" style="background:linear-gradient(135deg,#0a1a0a,#152d15)">🎭
+                            <div class="overlay"><div class="play-icon">▶</div></div>
+                        </div>
+                        <div class="movie-info">
+                            <h4>Family Fun</h4>
+                            <div class="stars">⭐⭐⭐⭐</div>
+                            <span class="genre-tag">Family</span>
+                            <button class="watch-btn" onclick="playMovie()">▶ รับชม</button>
+                        </div>
+                    </div>
+                    <div class="movie-card">
+                        <div class="movie-poster" style="background:linear-gradient(135deg,#1a100a,#2d1a15)">🎪
+                            <div class="overlay"><div class="play-icon">▶</div></div>
+                        </div>
+                        <div class="movie-info">
+                            <h4>Circus Night</h4>
+                            <div class="stars">⭐⭐⭐⭐</div>
+                            <span class="genre-tag">Comedy</span>
+                            <button class="watch-btn" onclick="playMovie()">▶ รับชม</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="movie-category">
+                <h3>💥 แอ็กชั่น</h3>
+                <div class="grid-4">
+                    <div class="movie-card">
+                        <div class="movie-poster" style="background:linear-gradient(135deg,#1a0a0a,#2d1010)">💥
+                            <div class="overlay"><div class="play-icon">▶</div></div>
+                        </div>
+                        <div class="movie-info">
+                            <h4>Thunder Strike</h4>
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                            <span class="genre-tag">Action</span>
+                            <button class="watch-btn" onclick="playMovie()">▶ รับชม</button>
+                        </div>
+                    </div>
+                    <div class="movie-card">
+                        <div class="movie-poster" style="background:linear-gradient(135deg,#0d0d1a,#1a1a2d)">⚔️
+                            <div class="overlay"><div class="play-icon">▶</div></div>
+                        </div>
+                        <div class="movie-info">
+                            <h4>Blade Runner</h4>
+                            <div class="stars">⭐⭐⭐⭐⭐</div>
+                            <span class="genre-tag">Action</span>
+                            <button class="watch-btn" onclick="playMovie()">▶ รับชม</button>
+                        </div>
+                    </div>
+                    <div class="movie-card">
+                        <div class="movie-poster" style="background:linear-gradient(135deg,#1a0d0a,#2d1a10)">🔥
+                            <div class="overlay"><div class="play-icon">▶</div></div>
+                        </div>
+                        <div class="movie-info">
+                            <h4>Inferno</h4>
+                            <div class="stars">⭐⭐⭐⭐</div>
+                            <span class="genre-tag">Action</span>
+                            <button class="watch-btn" onclick="playMovie()">▶ รับชม</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======= PAGE: GAMES ======= -->
+        <section class="page-section" id="page-games">
+            <div class="section-header">
+                <h2>🎮 มินิเกม</h2>
+                <p>เลือกเกมที่ชอบแล้วมาสนุกกันเลย!</p>
+            </div>
+
+            <div class="grid-3">
+                <div class="game-card" onclick="openGame('numberGuess')">
+                    <span class="game-icon">🎯</span>
+                    <h3>Number Guess</h3>
+                    <p>ทายตัวเลข 1-100 ลุ้นทายให้ถูก ใช้ตรรกะเข้าช่วย!</p>
+                    <button class="game-play-btn">เล่นเลย →</button>
+                </div>
+                <div class="game-card" onclick="openGame('rps')">
+                    <span class="game-icon">✂️</span>
+                    <h3>เป่ายิ้งฉุบ</h3>
+                    <p>เป่ายิ้งฉุบสุดมันส์ สู้กับ AI คุณจะชนะได้ไหม?</p>
+                    <button class="game-play-btn">เล่นเลย →</button>
+                </div>
+                <div class="game-card" onclick="openGame('memory')">
+                    <span class="game-icon">🧠</span>
+                    <h3>Memory Match</h3>
+                    <p>จับคู่การ์ดฝึกความจำ เปิดไพ่หาคู่ให้ครบ!</p>
+                    <button class="game-play-btn">เล่นเลย →</button>
+                </div>
+                <div class="game-card" onclick="openGame('reaction')">
+                    <span class="game-icon">⚡</span>
+                    <h3>Reaction Speed</h3>
+                    <p>ทดสอบความเร็วปฏิกิริยา คลิกทันทีที่เห็นสีเขียว!</p>
+                    <button class="game-play-btn">เล่นเลย →</button>
+                </div>
+                <div class="game-card" onclick="openGame('snake')">
+                    <span class="game-icon">🐍</span>
+                    <h3>Snake Game</h3>
+                    <p>เกมงูคลาสสิก! กินอาหารโตขึ้นเรื่อยๆ อย่าชนตัวเอง!</p>
+                    <button class="game-play-btn">เล่นเลย →</button>
+                </div>
+                <div class="game-card" onclick="openGame('slot')">
+                    <span class="game-icon">🎰</span>
+                    <h3>Slot Machine</h3>
+                    <p>สล็อตแมชชีนสุ่มรางวัล ลุ้นแจ็กพอต 777!</p>
+                    <button class="game-play-btn">เล่นเลย →</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======= PAGE: CALCULATOR ======= -->
+        <section class="page-section" id="page-calculator">
+            <div class="section-header">
+                <h2>🧮 เครื่องคิดเลข</h2>
+                <p>เครื่องคิดเลขสไตล์โมเดิร์น</p>
+            </div>
+            <div style="max-width:360px;">
+                <div class="widget-card">
+                    <input type="text" class="calc-display" id="calcDisplay" value="0" readonly>
+                    <div class="calc-grid">
+                        <button class="calc-btn clear" onclick="calcClear()">C</button>
+                        <button class="calc-btn op" onclick="calcInput('(')">(</button>
+                        <button class="calc-btn op" onclick="calcInput(')')">)</button>
+                        <button class="calc-btn op" onclick="calcInput('/')">÷</button>
+                        <button class="calc-btn" onclick="calcInput('7')">7</button>
+                        <button class="calc-btn" onclick="calcInput('8')">8</button>
+                        <button class="calc-btn" onclick="calcInput('9')">9</button>
+                        <button class="calc-btn op" onclick="calcInput('*')">×</button>
+                        <button class="calc-btn" onclick="calcInput('4')">4</button>
+                        <button class="calc-btn" onclick="calcInput('5')">5</button>
+                        <button class="calc-btn" onclick="calcInput('6')">6</button>
+                        <button class="calc-btn op" onclick="calcInput('-')">−</button>
+                        <button class="calc-btn" onclick="calcInput('1')">1</button>
+                        <button class="calc-btn" onclick="calcInput('2')">2</button>
+                        <button class="calc-btn" onclick="calcInput('3')">3</button>
+                        <button class="calc-btn op" onclick="calcInput('+')">+</button>
+                        <button class="calc-btn" onclick="calcInput('0')" style="grid-column:span 2">0</button>
+                        <button class="calc-btn" onclick="calcInput('.')">.</button>
+                        <button class="calc-btn eq" onclick="calcEqual()">=</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======= PAGE: NOTEPAD ======= -->
+        <section class="page-section" id="page-notepad">
+            <div class="section-header">
+                <h2>📝 จดบันทึก</h2>
+                <p>บันทึกข้อความส่วนตัว เก็บไว้ใน Local Storage</p>
+            </div>
+            <div style="max-width:600px;">
+                <div class="widget-card">
+                    <textarea class="notepad-area" id="notepadArea" placeholder="พิมพ์บันทึกของคุณที่นี่..."></textarea>
+                    <div class="notepad-actions">
+                        <button class="notepad-btn save" onclick="saveNote()">💾 บันทึก</button>
+                        <button class="notepad-btn clear-note" onclick="clearNote()">🗑️ ล้าง</button>
+                    </div>
+                    <div id="noteSaved" style="display:none;color:var(--neon-green);font-size:0.8em;margin-top:8px;">✅ บันทึกแล้ว!</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======= PAGE: TIMER ======= -->
+        <section class="page-section" id="page-timer">
+            <div class="section-header">
+                <h2>⏱️ Pomodoro Timer</h2>
+                <p>จับเวลาทำงาน / พักผ่อน แบบ Pomodoro</p>
+            </div>
+            <div style="max-width:400px;">
+                <div class="widget-card" style="text-align:center;">
+                    <div class="timer-display" id="pomodoroDisplay">25:00</div>
+                    <div style="margin-bottom:16px;font-size:0.85em;color:var(--text-muted)" id="pomodoroPhase">🍅 เวลาทำงาน</div>
+                    <div class="timer-controls">
+                        <button class="game-btn primary" id="pomodoroStart" onclick="togglePomodoro()">▶ เริ่ม</button>
+                        <button class="game-btn danger" onclick="resetPomodoro()">↻ รีเซ็ต</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======= PAGE: MUSIC ======= -->
+        <section class="page-section" id="page-music">
+            <div class="section-header">
+                <h2>🎵 Music Player</h2>
+                <p>เพลงพื้นหลังเพลิดเพลินขณะใช้งาน</p>
+            </div>
+            <div style="max-width:500px;">
+                <div class="widget-card">
+                    <div class="widget-header">🎶 Now Playing</div>
+                    <div class="music-mini" id="musicPlayer">
+                        <div class="music-cover" id="musicCover">🎵</div>
+                        <div class="music-info">
+                            <div class="song" id="musicSong">Chill Lofi Beat</div>
+                            <div class="artist" id="musicArtist">CineStream Radio</div>
+                        </div>
+                        <div class="music-controls">
+                            <button class="music-btn" onclick="prevTrack()">⏮</button>
+                            <button class="music-btn play-pause" id="playPauseBtn" onclick="toggleMusic()">▶</button>
+                            <button class="music-btn" onclick="nextTrack()">⏭</button>
+                        </div>
+                    </div>
+                    <div style="margin-top:16px;">
+                        <div style="font-size:0.82em;color:var(--text-muted);margin-bottom:10px;">📋 Playlist</div>
+                        <div id="playlist"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======= PAGE: LEADERBOARD ======= -->
+        <section class="page-section" id="page-leaderboard">
+            <div class="section-header">
+                <h2>🏆 ลีดเดอร์บอร์ด</h2>
+                <p>อันดับคะแนนมินิเกมทั้งหมด</p>
+            </div>
+            <div style="max-width:500px;">
+                <div class="widget-card">
+                    <div class="widget-header">🎮 Top Scores</div>
+                    <ul class="leaderboard-list" id="leaderboardList">
+                        <li style="color:var(--text-muted);text-align:center;justify-content:center;">ยังไม่มีคะแนน — ไปเล่นเกมกันก่อน!</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ====== GAME MODALS ====== -->
+
+    <!-- Number Guess Modal -->
+    <div class="modal-overlay" id="modal-numberGuess">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeGame('numberGuess')">✕</button>
+            <div class="modal-title">🎯 Number Guess</div>
+            <div class="game-area">
+                <p style="margin-bottom:16px;color:var(--text-muted);font-size:0.9em;">ทายตัวเลข 1-100 — คอมพิวเตอร์สุ่มตัวเลขไว้แล้ว!</p>
+                <div style="display:flex;gap:10px;margin-bottom:16px;">
+                    <input type="number" id="guessInput" min="1" max="100" placeholder="ใส่ตัวเลข..."
+                        style="flex:1;padding:12px 16px;border-radius:10px;border:1px solid var(--border-glass);background:rgba(255,255,255,0.05);color:var(--text-primary);font-size:1em;outline:none;font-family:'Inter',sans-serif;">
+                    <button class="game-btn primary" onclick="makeGuess()">ทาย!</button>
+                </div>
+                <div id="guessHint" style="font-size:0.9em;color:var(--text-muted);"></div>
+                <div id="guessAttempts" style="font-size:0.82em;color:var(--text-muted);margin-top:8px;"></div>
+                <div id="guessResult" class="game-result" style="display:none;"></div>
+                <button class="game-btn primary" style="margin-top:16px;" onclick="resetNumberGuess()">🔄 เล่นใหม่</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RPS Modal -->
+    <div class="modal-overlay" id="modal-rps">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeGame('rps')">✕</button>
+            <div class="modal-title">✂️ เป่ายิ้งฉุบ</div>
+            <div class="game-area">
+                <p style="margin-bottom:10px;color:var(--text-muted);font-size:0.9em;">เลือกอาวุธของคุณ!</p>
+                <div class="rps-choices">
+                    <button class="rps-btn" onclick="playRPS('rock')" title="ค้อน">✊</button>
+                    <button class="rps-btn" onclick="playRPS('scissors')" title="กรรไกร">✌️</button>
+                    <button class="rps-btn" onclick="playRPS('paper')" title="กระดาษ">🖐️</button>
+                </div>
+                <div id="rpsResult" style="font-size:1em;margin-top:12px;font-weight:600;min-height:30px;"></div>
+                <div id="rpsScore" style="font-size:0.85em;color:var(--text-muted);margin-top:8px;">ชนะ: 0 | แพ้: 0 | เสมอ: 0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Memory Match Modal -->
+    <div class="modal-overlay" id="modal-memory">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeGame('memory')">✕</button>
+            <div class="modal-title">🧠 Memory Match</div>
+            <div class="game-area">
+                <div style="display:flex;justify-content:space-between;margin-bottom:14px;font-size:0.85em;">
+                    <span>คู่: <strong id="memoryPairs">0</strong>/8</span>
+                    <span>ลอง: <strong id="memoryMoves">0</strong> ครั้ง</span>
+                </div>
+                <div class="memory-grid" id="memoryGrid"></div>
+                <button class="game-btn primary" style="margin-top:14px;" onclick="resetMemory()">🔄 เล่นใหม่</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reaction Speed Modal -->
+    <div class="modal-overlay" id="modal-reaction">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeGame('reaction')">✕</button>
+            <div class="modal-title">⚡ Reaction Speed</div>
+            <div class="game-area">
+                <div class="reaction-box" id="reactionBox" onclick="reactionClick()">
+                    คลิกเพื่อเริ่ม
+                </div>
+                <div id="reactionResult" style="font-size:0.9em;margin-top:14px;color:var(--text-muted);"></div>
+                <div id="reactionBest" style="font-size:0.82em;margin-top:6px;color:var(--neon-gold);"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Snake Modal -->
+    <div class="modal-overlay" id="modal-snake">
+        <div class="modal-box" style="max-width:440px;">
+            <button class="modal-close" onclick="closeGame('snake')">✕</button>
+            <div class="modal-title">🐍 Snake Game</div>
+            <div class="game-area">
+                <div style="display:flex;justify-content:space-between;margin-bottom:12px;font-size:0.88em;">
+                    <span>Score: <strong id="snakeScore">0</strong></span>
+                    <span>Best: <strong id="snakeBest">0</strong></span>
+                </div>
+                <canvas id="snake-canvas" width="360" height="360"></canvas>
+                <div style="margin-top:14px;display:flex;gap:10px;justify-content:center;">
+                    <button class="game-btn primary" onclick="startSnake()">▶ เริ่มเกม</button>
+                </div>
+                <div style="font-size:0.75em;color:var(--text-muted);margin-top:10px;">ใช้ปุ่มลูกศร ← ↑ → ↓ หรือ WASD</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slot Machine Modal -->
+    <div class="modal-overlay" id="modal-slot">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeGame('slot')">✕</button>
+            <div class="modal-title">🎰 Slot Machine</div>
+            <div class="game-area">
+                <div style="font-size:0.88em;color:var(--text-muted);margin-bottom:6px;">💰 เหรียญ: <strong id="slotCoins" style="color:var(--neon-gold);">100</strong></div>
+                <div class="slot-display">
+                    <div class="slot-reel" id="reel1">🍒</div>
+                    <div class="slot-reel" id="reel2">🍋</div>
+                    <div class="slot-reel" id="reel3">🍇</div>
+                </div>
+                <div id="slotResult" style="font-size:0.95em;font-weight:600;min-height:30px;margin:10px 0;"></div>
+                <button class="game-btn primary" id="spinBtn" onclick="spinSlot()">🎰 หมุน! (10 เหรียญ)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====== AUTH CHECK ======
+        const user = sessionStorage.getItem("loggedInUser");
+        const expireStr = sessionStorage.getItem("expireDate");
+        if (!user) { window.location.href = "login.html"; }
+
+        // ====== USER INFO ======
+        const initial = user ? user.charAt(0).toUpperCase() : '?';
+        document.getElementById('userAvatar').textContent = initial;
+        document.getElementById('userName').textContent = user;
+        document.getElementById('welcomeAvatar').textContent = initial;
+        document.getElementById('welcomeMsg').textContent = `สวัสดี, ${user}! 👋`;
+
+        // ====== SUBSCRIPTION STATUS ======
+        const today = new Date(); today.setHours(0,0,0,0);
+        const expireDate = new Date(expireStr); expireDate.setHours(0,0,0,0);
+        const diffTime = expireDate.getTime() - today.getTime();
+        const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        let isExpired = false;
+
+        const statusBadge = document.getElementById('statusBadge');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const daysLeftEl = document.getElementById('daysLeftValue');
+        const daysProgress = document.getElementById('daysProgress');
+        const daysProgressText = document.getElementById('daysProgressText');
+
+        if (daysLeft > 0) {
+            statusBadge.classList.add('active');
+            statusText.textContent = `${daysLeft} วัน`;
+            daysLeftEl.textContent = daysLeft;
+            const pct = Math.min(100, (daysLeft / 30) * 100);
+            daysProgress.style.width = pct + '%';
+            daysProgressText.textContent = `เหลือ ${daysLeft} จาก 30 วัน`;
+        } else {
+            statusBadge.classList.add('expired');
+            statusText.textContent = 'หมดอายุ';
+            daysLeftEl.textContent = '0';
+            daysProgress.style.width = '0%';
+            daysProgressText.textContent = 'แพ็กเกจหมดอายุแล้ว';
+            isExpired = true;
+        }
+
+        function playMovie() {
+            if (isExpired) { alert("❌ บัญชีรายเดือนของคุณหมดอายุแล้ว กรุณาติดต่อแอดมินเพื่อเติมวันใช้งาน"); }
+            else { alert("🎬 เริ่มเล่นภาพยนตร์... ขอให้สนุกกับการรับชม!"); }
+        }
+
+        function logout() { sessionStorage.clear(); window.location.href = "login.html"; }
+
+        // ====== SESSION TIMER ======
+        let sessionSeconds = 0;
+        setInterval(() => {
+            sessionSeconds++;
+            const h = String(Math.floor(sessionSeconds / 3600)).padStart(2, '0');
+            const m = String(Math.floor((sessionSeconds % 3600) / 60)).padStart(2, '0');
+            const s = String(sessionSeconds % 60).padStart(2, '0');
+            document.getElementById('sessionTimer').textContent = `⏱ ${h}:${m}:${s}`;
+        }, 1000);
+
+        // ====== SIDEBAR COLLAPSE ======
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        document.getElementById('collapseBtn').addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+
+        // ====== NAVIGATION ======
+        const navItems = document.querySelectorAll('.nav-item[data-page]');
+        const pageSections = document.querySelectorAll('.page-section');
+        const pageTitle = document.getElementById('pageTitle');
+
+        const pageTitles = {
+            overview: '🏠 ภาพรวม',
+            movies: '🎬 ภาพยนตร์',
+            games: '🎮 มินิเกม',
+            calculator: '🧮 เครื่องคิดเลข',
+            notepad: '📝 จดบันทึก',
+            timer: '⏱️ Pomodoro Timer',
+            music: '🎵 Music Player',
+            leaderboard: '🏆 ลีดเดอร์บอร์ด'
+        };
+
+        function navigateTo(page) {
+            navItems.forEach(n => n.classList.remove('active'));
+            pageSections.forEach(p => p.classList.remove('active'));
+            const targetNav = document.querySelector(`.nav-item[data-page="${page}"]`);
+            const targetPage = document.getElementById(`page-${page}`);
+            if (targetNav) targetNav.classList.add('active');
+            if (targetPage) {
+                targetPage.classList.add('active');
+                targetPage.style.animation = 'none';
+                targetPage.offsetHeight;
+                targetPage.style.animation = '';
+            }
+            pageTitle.textContent = pageTitles[page] || page;
+        }
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navigateTo(item.dataset.page);
+            });
+        });
+
+        // ====== GAME STATS ======
+        let totalGamesPlayed = parseInt(localStorage.getItem('cine_games_played') || '0');
+        let globalBestScore = parseInt(localStorage.getItem('cine_best_score') || '0');
+        document.getElementById('gamesPlayed').textContent = totalGamesPlayed;
+        document.getElementById('bestScore').textContent = globalBestScore;
+
+        function incrementGamesPlayed() {
+            totalGamesPlayed++;
+            localStorage.setItem('cine_games_played', totalGamesPlayed);
+            document.getElementById('gamesPlayed').textContent = totalGamesPlayed;
+        }
+
+        function updateBestScore(score) {
+            if (score > globalBestScore) {
+                globalBestScore = score;
+                localStorage.setItem('cine_best_score', globalBestScore);
+                document.getElementById('bestScore').textContent = globalBestScore;
+            }
+            updateLeaderboard();
+        }
+
+        // ====== MODAL OPEN/CLOSE ======
+        function openGame(game) {
+            document.getElementById(`modal-${game}`).classList.add('show');
+            if (game === 'memory') resetMemory();
+            if (game === 'numberGuess') resetNumberGuess();
+            if (game === 'snake') initSnakeCanvas();
+        }
+
+        function closeGame(game) {
+            document.getElementById(`modal-${game}`).classList.remove('show');
+            if (game === 'snake' && snakeInterval) { clearInterval(snakeInterval); snakeInterval = null; }
+        }
+
+        // ====== GAME 1: NUMBER GUESS ======
+        let guessTarget = 0;
+        let guessCount = 0;
+        let guessFinished = false;
+
+        function resetNumberGuess() {
+            guessTarget = Math.floor(Math.random() * 100) + 1;
+            guessCount = 0;
+            guessFinished = false;
+            document.getElementById('guessInput').value = '';
+            document.getElementById('guessHint').textContent = '';
+            document.getElementById('guessAttempts').textContent = '';
+            document.getElementById('guessResult').style.display = 'none';
+        }
+        resetNumberGuess();
+
+        function makeGuess() {
+            if (guessFinished) return;
+            const input = parseInt(document.getElementById('guessInput').value);
+            if (isNaN(input) || input < 1 || input > 100) {
+                document.getElementById('guessHint').textContent = '⚠️ กรุณาใส่ตัวเลข 1-100';
+                return;
+            }
+            guessCount++;
+            document.getElementById('guessAttempts').textContent = `จำนวนครั้งที่ทาย: ${guessCount}`;
+
+            if (input === guessTarget) {
+                guessFinished = true;
+                const res = document.getElementById('guessResult');
+                res.textContent = `🎉 ถูกต้อง! ตัวเลขคือ ${guessTarget} — ใช้ ${guessCount} ครั้ง!`;
+                res.className = 'game-result win';
+                res.style.display = 'block';
+                document.getElementById('guessHint').textContent = '';
+                incrementGamesPlayed();
+                const score = Math.max(1, 101 - guessCount * 10);
+                updateBestScore(score);
+                addLeaderboardEntry('Number Guess', score);
+            } else if (input < guessTarget) {
+                document.getElementById('guessHint').innerHTML = '📈 <strong>มากกว่า</strong>นี้! ลองอีกครั้ง';
+            } else {
+                document.getElementById('guessHint').innerHTML = '📉 <strong>น้อยกว่า</strong>นี้! ลองอีกครั้ง';
+            }
+            document.getElementById('guessInput').value = '';
+            document.getElementById('guessInput').focus();
+        }
+
+        document.getElementById('guessInput')?.addEventListener('keydown', e => {
+            if (e.key === 'Enter') makeGuess();
+        });
+
+        // ====== GAME 2: ROCK PAPER SCISSORS ======
+        let rpsWin = 0, rpsLose = 0, rpsDraw = 0;
+
+        function playRPS(player) {
+            const choices = ['rock', 'scissors', 'paper'];
+            const emojis = { rock: '✊', scissors: '✌️', paper: '🖐️' };
+            const ai = choices[Math.floor(Math.random() * 3)];
+            let result;
+
+            if (player === ai) {
+                result = `${emojis[player]} vs ${emojis[ai]} — 🤝 เสมอ!`;
+                rpsDraw++;
+            } else if ((player === 'rock' && ai === 'scissors') ||
+                       (player === 'scissors' && ai === 'paper') ||
+                       (player === 'paper' && ai === 'rock')) {
+                result = `${emojis[player]} vs ${emojis[ai]} — 🎉 คุณชนะ!`;
+                rpsWin++;
+                incrementGamesPlayed();
+                updateBestScore(rpsWin * 10);
+                addLeaderboardEntry('เป่ายิ้งฉุบ', rpsWin * 10);
+            } else {
+                result = `${emojis[player]} vs ${emojis[ai]} — 😢 คุณแพ้!`;
+                rpsLose++;
+                incrementGamesPlayed();
+            }
+
+            document.getElementById('rpsResult').innerHTML = result;
+            document.getElementById('rpsScore').textContent = `ชนะ: ${rpsWin} | แพ้: ${rpsLose} | เสมอ: ${rpsDraw}`;
+        }
+
+        // ====== GAME 3: MEMORY MATCH ======
+        const memoryEmojis = ['🎮', '🎯', '🚀', '⚡', '🔥', '💎', '🌈', '🎵'];
+        let memoryCards = [];
+        let memoryFlipped = [];
+        let memoryMatched = 0;
+        let memoryMoves = 0;
+        let memoryLocked = false;
+
+        function resetMemory() {
+            memoryMatched = 0;
+            memoryMoves = 0;
+            memoryFlipped = [];
+            memoryLocked = false;
+            document.getElementById('memoryPairs').textContent = '0';
+            document.getElementById('memoryMoves').textContent = '0';
+
+            const pairs = [...memoryEmojis, ...memoryEmojis];
+            memoryCards = pairs.sort(() => Math.random() - 0.5);
+
+            const grid = document.getElementById('memoryGrid');
+            grid.innerHTML = '';
+            memoryCards.forEach((emoji, i) => {
+                const tile = document.createElement('div');
+                tile.className = 'memory-tile';
+                tile.dataset.index = i;
+                tile.dataset.emoji = emoji;
+                tile.textContent = '?';
+                tile.addEventListener('click', () => flipTile(tile));
+                grid.appendChild(tile);
+            });
+        }
+
+        function flipTile(tile) {
+            if (memoryLocked) return;
+            if (tile.classList.contains('flipped') || tile.classList.contains('matched')) return;
+            if (memoryFlipped.length >= 2) return;
+
+            tile.classList.add('flipped');
+            tile.textContent = tile.dataset.emoji;
+            memoryFlipped.push(tile);
+
+            if (memoryFlipped.length === 2) {
+                memoryMoves++;
+                document.getElementById('memoryMoves').textContent = memoryMoves;
+                memoryLocked = true;
+
+                if (memoryFlipped[0].dataset.emoji === memoryFlipped[1].dataset.emoji) {
+                    memoryFlipped[0].classList.add('matched');
+                    memoryFlipped[1].classList.add('matched');
+                    memoryMatched++;
+                    document.getElementById('memoryPairs').textContent = memoryMatched;
+                    memoryFlipped = [];
+                    memoryLocked = false;
+
+                    if (memoryMatched === 8) {
+                        incrementGamesPlayed();
+                        const score = Math.max(10, 200 - memoryMoves * 5);
+                        updateBestScore(score);
+                        addLeaderboardEntry('Memory Match', score);
+                        setTimeout(() => alert(`🎉 ยอดเยี่ยม! จับคู่ครบใน ${memoryMoves} ครั้ง! คะแนน: ${score}`), 300);
+                    }
+                } else {
+                    setTimeout(() => {
+                        memoryFlipped[0].classList.remove('flipped');
+                        memoryFlipped[0].textContent = '?';
+                        memoryFlipped[1].classList.remove('flipped');
+                        memoryFlipped[1].textContent = '?';
+                        memoryFlipped = [];
+                        memoryLocked = false;
+                    }, 800);
+                }
+            }
+        }
+
+        // ====== GAME 4: REACTION SPEED ======
+        let reactionState = 'idle'; // idle, waiting, ready
+        let reactionTimeout = null;
+        let reactionStart = 0;
+        let reactionBest = Infinity;
+
+        function reactionClick() {
+            const box = document.getElementById('reactionBox');
+            const resultEl = document.getElementById('reactionResult');
+
+            if (reactionState === 'idle') {
+                reactionState = 'waiting';
+                box.className = 'reaction-box waiting';
+                box.textContent = '⏳ รอ... อย่าคลิก!';
+                resultEl.textContent = '';
+
+                const delay = Math.random() * 3000 + 1500;
+                reactionTimeout = setTimeout(() => {
+                    reactionState = 'ready';
+                    box.className = 'reaction-box ready';
+                    box.textContent = '🟢 คลิกเดี๋ยวนี้!';
+                    reactionStart = Date.now();
+                }, delay);
+            } else if (reactionState === 'waiting') {
+                clearTimeout(reactionTimeout);
+                reactionState = 'idle';
+                box.className = 'reaction-box';
+                box.textContent = '😅 เร็วเกินไป! คลิกเพื่อลองใหม่';
+                resultEl.textContent = '❌ คุณคลิกก่อนเวลา!';
+            } else if (reactionState === 'ready') {
+                const ms = Date.now() - reactionStart;
+                reactionState = 'idle';
+                box.className = 'reaction-box';
+                box.textContent = `⚡ ${ms} ms — คลิกเพื่อเล่นอีก`;
+                resultEl.textContent = `เวลาตอบสนอง: ${ms} ms`;
+
+                if (ms < reactionBest) {
+                    reactionBest = ms;
+                    document.getElementById('reactionBest').textContent = `🏆 สถิติดีที่สุด: ${reactionBest} ms`;
+                }
+
+                incrementGamesPlayed();
+                const score = Math.max(1, Math.round(500 - ms));
+                updateBestScore(score);
+                addLeaderboardEntry('Reaction Speed', score);
+            }
+        }
+
+        // ====== GAME 5: SNAKE ======
+        let snakeCanvas, snakeCtx;
+        let snake, food, direction, snakeInterval;
+        let snakeScoreVal = 0;
+        let snakeBestVal = parseInt(localStorage.getItem('cine_snake_best') || '0');
+        const GRID = 18;
+        const TILE = 20;
+
+        function initSnakeCanvas() {
+            snakeCanvas = document.getElementById('snake-canvas');
+            snakeCtx = snakeCanvas.getContext('2d');
+            snakeCanvas.width = GRID * TILE;
+            snakeCanvas.height = GRID * TILE;
+            document.getElementById('snakeBest').textContent = snakeBestVal;
+            drawSnakeIdle();
+        }
+
+        function drawSnakeIdle() {
+            if (!snakeCtx) return;
+            snakeCtx.fillStyle = '#0a0a0f';
+            snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+            snakeCtx.fillStyle = 'rgba(255,255,255,0.2)';
+            snakeCtx.font = '16px Inter';
+            snakeCtx.textAlign = 'center';
+            snakeCtx.fillText('กด "เริ่มเกม" เพื่อเล่น', snakeCanvas.width/2, snakeCanvas.height/2);
+        }
+
+        function startSnake() {
+            if (snakeInterval) clearInterval(snakeInterval);
+            snake = [{x: 9, y: 9}];
+            direction = {x: 1, y: 0};
+            snakeScoreVal = 0;
+            document.getElementById('snakeScore').textContent = '0';
+            spawnFood();
+            snakeInterval = setInterval(snakeLoop, 120);
+        }
+
+        function spawnFood() {
+            food = {
+                x: Math.floor(Math.random() * GRID),
+                y: Math.floor(Math.random() * GRID)
+            };
+            // Don't spawn on snake
+            for (let s of snake) {
+                if (s.x === food.x && s.y === food.y) { spawnFood(); return; }
+            }
+        }
+
+        function snakeLoop() {
+            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+
+            // Wall collision
+            if (head.x < 0 || head.x >= GRID || head.y < 0 || head.y >= GRID) { gameOverSnake(); return; }
+
+            // Self collision
+            for (let s of snake) {
+                if (s.x === head.x && s.y === head.y) { gameOverSnake(); return; }
+            }
+
+            snake.unshift(head);
+
+            if (head.x === food.x && head.y === food.y) {
+                snakeScoreVal += 10;
+                document.getElementById('snakeScore').textContent = snakeScoreVal;
+                spawnFood();
+            } else {
+                snake.pop();
+            }
+
+            drawSnake();
+        }
+
+        function drawSnake() {
+            snakeCtx.fillStyle = '#0a0a0f';
+            snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+
+            // Grid lines
+            snakeCtx.strokeStyle = 'rgba(255,255,255,0.03)';
+            for (let i = 0; i < GRID; i++) {
+                snakeCtx.beginPath();
+                snakeCtx.moveTo(i * TILE, 0);
+                snakeCtx.lineTo(i * TILE, snakeCanvas.height);
+                snakeCtx.stroke();
+                snakeCtx.beginPath();
+                snakeCtx.moveTo(0, i * TILE);
+                snakeCtx.lineTo(snakeCanvas.width, i * TILE);
+                snakeCtx.stroke();
+            }
+
+            // Food
+            snakeCtx.fillStyle = '#ff2d55';
+            snakeCtx.shadowColor = '#ff2d55';
+            snakeCtx.shadowBlur = 10;
+            snakeCtx.beginPath();
+            snakeCtx.arc(food.x * TILE + TILE/2, food.y * TILE + TILE/2, TILE/2 - 2, 0, Math.PI * 2);
+            snakeCtx.fill();
+            snakeCtx.shadowBlur = 0;
+
+            // Snake
+            snake.forEach((s, i) => {
+                const alpha = 1 - (i / snake.length) * 0.5;
+                snakeCtx.fillStyle = i === 0 ? '#00d4ff' : `rgba(0, 212, 255, ${alpha})`;
+                snakeCtx.shadowColor = '#00d4ff';
+                snakeCtx.shadowBlur = i === 0 ? 8 : 0;
+                snakeCtx.fillRect(s.x * TILE + 1, s.y * TILE + 1, TILE - 2, TILE - 2);
+                snakeCtx.shadowBlur = 0;
+            });
+        }
+
+        function gameOverSnake() {
+            clearInterval(snakeInterval);
+            snakeInterval = null;
+            incrementGamesPlayed();
+            updateBestScore(snakeScoreVal);
+            addLeaderboardEntry('Snake', snakeScoreVal);
+            if (snakeScoreVal > snakeBestVal) {
+                snakeBestVal = snakeScoreVal;
+                localStorage.setItem('cine_snake_best', snakeBestVal);
+                document.getElementById('snakeBest').textContent = snakeBestVal;
+            }
+            alert(`🐍 Game Over! คะแนน: ${snakeScoreVal}`);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (!snakeInterval) return;
+            const map = {
+                ArrowUp: {x:0,y:-1}, ArrowDown: {x:0,y:1},
+                ArrowLeft: {x:-1,y:0}, ArrowRight: {x:1,y:0},
+                w: {x:0,y:-1}, s: {x:0,y:1}, a: {x:-1,y:0}, d: {x:1,y:0},
+                W: {x:0,y:-1}, S: {x:0,y:1}, A: {x:-1,y:0}, D: {x:1,y:0},
+            };
+            const dir = map[e.key];
+            if (dir) {
+                // Prevent reverse
+                if (dir.x !== -direction.x || dir.y !== -direction.y) {
+                    direction = dir;
+                }
+                e.preventDefault();
+            }
+        });
+
+        // ====== GAME 6: SLOT MACHINE ======
+        let slotCoins = parseInt(localStorage.getItem('cine_slot_coins') || '100');
+        const slotSymbols = ['🍒', '🍋', '🍇', '🔔', '⭐', '💎', '7️⃣'];
+        document.getElementById('slotCoins').textContent = slotCoins;
+        let isSpinning = false;
+
+        function spinSlot() {
+            if (isSpinning) return;
+            if (slotCoins < 10) {
+                document.getElementById('slotResult').innerHTML = '😢 เหรียญไม่พอ! <button class="game-btn primary" style="margin-top:8px;padding:8px 16px;font-size:0.8em;" onclick="slotCoins=100;localStorage.setItem(\'cine_slot_coins\',100);document.getElementById(\'slotCoins\').textContent=100;document.getElementById(\'slotResult\').textContent=\'\';">🔄 เติมเหรียญ</button>';
+                return;
+            }
+
+            isSpinning = true;
+            slotCoins -= 10;
+            document.getElementById('slotCoins').textContent = slotCoins;
+            document.getElementById('slotResult').textContent = '';
+
+            const reels = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+            reels.forEach(r => r.classList.add('spinning'));
+
+            let spins = 0;
+            const spinInterval = setInterval(() => {
+                reels.forEach(r => r.textContent = slotSymbols[Math.floor(Math.random() * slotSymbols.length)]);
+                spins++;
+                if (spins > 20) {
+                    clearInterval(spinInterval);
+                    reels.forEach(r => r.classList.remove('spinning'));
+
+                    const results = reels.map(r => r.textContent);
+                    let winnings = 0;
+
+                    if (results[0] === results[1] && results[1] === results[2]) {
+                        if (results[0] === '7️⃣') {
+                            winnings = 500;
+                            document.getElementById('slotResult').innerHTML = '🎉🎉🎉 <strong>JACKPOT 777!</strong> +500 เหรียญ!';
+                        } else if (results[0] === '💎') {
+                            winnings = 200;
+                            document.getElementById('slotResult').innerHTML = '💎💎💎 <strong>DIAMOND!</strong> +200 เหรียญ!';
+                        } else {
+                            winnings = 50;
+                            document.getElementById('slotResult').innerHTML = `${results[0]}${results[0]}${results[0]} <strong>TRIPLE!</strong> +50 เหรียญ!`;
+                        }
+                        document.getElementById('slotResult').style.color = 'var(--neon-gold)';
+                    } else if (results[0] === results[1] || results[1] === results[2]) {
+                        winnings = 15;
+                        document.getElementById('slotResult').innerHTML = '👍 คู่! +15 เหรียญ';
+                        document.getElementById('slotResult').style.color = 'var(--neon-cyan)';
+                    } else {
+                        document.getElementById('slotResult').textContent = '😔 ไม่ถูกรางวัล ลองอีกครั้ง!';
+                        document.getElementById('slotResult').style.color = 'var(--text-muted)';
+                    }
+
+                    slotCoins += winnings;
+                    document.getElementById('slotCoins').textContent = slotCoins;
+                    localStorage.setItem('cine_slot_coins', slotCoins);
+                    incrementGamesPlayed();
+                    if (winnings > 0) {
+                        updateBestScore(winnings);
+                        addLeaderboardEntry('Slot Machine', winnings);
+                    }
+                    isSpinning = false;
+                }
+            }, 80);
+        }
+
+        // ====== CALCULATOR ======
+        let calcStr = '';
+
+        function calcInput(val) {
+            calcStr += val;
+            document.getElementById('calcDisplay').value = calcStr;
+        }
+
+        function calcClear() {
+            calcStr = '';
+            document.getElementById('calcDisplay').value = '0';
+        }
+
+        function calcEqual() {
+            try {
+                const result = Function('"use strict"; return (' + calcStr + ')')();
+                document.getElementById('calcDisplay').value = result;
+                calcStr = String(result);
+            } catch {
+                document.getElementById('calcDisplay').value = 'Error';
+                calcStr = '';
+            }
+        }
+
+        // ====== NOTEPAD ======
+        const notepadArea = document.getElementById('notepadArea');
+        notepadArea.value = localStorage.getItem('cine_notepad') || '';
+
+        function saveNote() {
+            localStorage.setItem('cine_notepad', notepadArea.value);
+            const saved = document.getElementById('noteSaved');
+            saved.style.display = 'block';
+            setTimeout(() => saved.style.display = 'none', 2000);
+        }
+
+        function clearNote() {
+            if (confirm('ล้างบันทึกทั้งหมด?')) {
+                notepadArea.value = '';
+                localStorage.removeItem('cine_notepad');
+            }
+        }
+
+        // ====== POMODORO TIMER ======
+        let pomodoroTime = 25 * 60;
+        let pomodoroRunning = false;
+        let pomodoroInterval = null;
+        let pomodoroWork = true;
+
+        function updatePomodoroDisplay() {
+            const m = String(Math.floor(pomodoroTime / 60)).padStart(2, '0');
+            const s = String(pomodoroTime % 60).padStart(2, '0');
+            document.getElementById('pomodoroDisplay').textContent = `${m}:${s}`;
+        }
+
+        function togglePomodoro() {
+            if (pomodoroRunning) {
+                clearInterval(pomodoroInterval);
+                pomodoroRunning = false;
+                document.getElementById('pomodoroStart').textContent = '▶ เริ่ม';
+            } else {
+                pomodoroRunning = true;
+                document.getElementById('pomodoroStart').textContent = '⏸ หยุด';
+                pomodoroInterval = setInterval(() => {
+                    pomodoroTime--;
+                    updatePomodoroDisplay();
+                    if (pomodoroTime <= 0) {
+                        clearInterval(pomodoroInterval);
+                        pomodoroRunning = false;
+                        if (pomodoroWork) {
+                            alert('🎉 หมดเวลาทำงาน! พักผ่อนหน่อย');
+                            pomodoroWork = false;
+                            pomodoroTime = 5 * 60;
+                            document.getElementById('pomodoroPhase').textContent = '☕ เวลาพักผ่อน';
+                        } else {
+                            alert('💪 หมดเวลาพัก! กลับมาทำงานต่อ');
+                            pomodoroWork = true;
+                            pomodoroTime = 25 * 60;
+                            document.getElementById('pomodoroPhase').textContent = '🍅 เวลาทำงาน';
+                        }
+                        updatePomodoroDisplay();
+                        document.getElementById('pomodoroStart').textContent = '▶ เริ่ม';
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetPomodoro() {
+            clearInterval(pomodoroInterval);
+            pomodoroRunning = false;
+            pomodoroWork = true;
+            pomodoroTime = 25 * 60;
+            updatePomodoroDisplay();
+            document.getElementById('pomodoroPhase').textContent = '🍅 เวลาทำงาน';
+            document.getElementById('pomodoroStart').textContent = '▶ เริ่ม';
+        }
+
+        // ====== MUSIC PLAYER ======
+        const tracks = [
+            { name: 'Chill Lofi Beat', artist: 'CineStream Radio', icon: '🎵' },
+            { name: 'Ambient Dreams', artist: 'Sunset Studio', icon: '🌅' },
+            { name: 'Electric Pulse', artist: 'Neon Wave', icon: '⚡' },
+            { name: 'Jazz Café', artist: 'Smooth Sounds', icon: '☕' },
+            { name: 'Ocean Breeze', artist: 'Nature Mix', icon: '🌊' },
+        ];
+        let currentTrack = 0;
+        let musicPlaying = false;
+
+        function renderPlaylist() {
+            const pl = document.getElementById('playlist');
+            pl.innerHTML = '';
+            tracks.forEach((t, i) => {
+                const item = document.createElement('div');
+                item.style.cssText = `display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:0.85em;margin-bottom:4px;transition:all 0.3s;background:${i===currentTrack?'rgba(0,212,255,0.08)':'transparent'};`;
+                item.innerHTML = `<span>${t.icon}</span><span style="flex:1;font-weight:${i===currentTrack?'600':'400'}">${t.name}</span><span style="font-size:0.75em;color:var(--text-muted)">${t.artist}</span>`;
+                item.addEventListener('click', () => { currentTrack = i; updateMusicUI(); });
+                item.addEventListener('mouseenter', () => { if (i !== currentTrack) item.style.background = 'rgba(255,255,255,0.04)'; });
+                item.addEventListener('mouseleave', () => { if (i !== currentTrack) item.style.background = 'transparent'; });
+                pl.appendChild(item);
+            });
+        }
+
+        function updateMusicUI() {
+            const t = tracks[currentTrack];
+            document.getElementById('musicSong').textContent = t.name;
+            document.getElementById('musicArtist').textContent = t.artist;
+            document.getElementById('musicCover').textContent = t.icon;
+            renderPlaylist();
+        }
+
+        function toggleMusic() {
+            musicPlaying = !musicPlaying;
+            document.getElementById('playPauseBtn').textContent = musicPlaying ? '⏸' : '▶';
+        }
+
+        function nextTrack() {
+            currentTrack = (currentTrack + 1) % tracks.length;
+            updateMusicUI();
+        }
+
+        function prevTrack() {
+            currentTrack = (currentTrack - 1 + tracks.length) % tracks.length;
+            updateMusicUI();
+        }
+
+        renderPlaylist();
+
+        // ====== LEADERBOARD ======
+        function getLeaderboard() {
+            return JSON.parse(localStorage.getItem('cine_leaderboard') || '[]');
+        }
+
+        function addLeaderboardEntry(game, score) {
+            const lb = getLeaderboard();
+            lb.push({ game, score, user: user, time: new Date().toLocaleString('th-TH') });
+            lb.sort((a, b) => b.score - a.score);
+            localStorage.setItem('cine_leaderboard', JSON.stringify(lb.slice(0, 20)));
+            updateLeaderboard();
+        }
+
+        function updateLeaderboard() {
+            const lb = getLeaderboard();
+            const list = document.getElementById('leaderboardList');
+            if (lb.length === 0) {
+                list.innerHTML = '<li style="color:var(--text-muted);text-align:center;justify-content:center;">ยังไม่มีคะแนน — ไปเล่นเกมกันก่อน!</li>';
+                return;
+            }
+            list.innerHTML = '';
+            lb.slice(0, 10).forEach((entry, i) => {
+                const medals = ['🥇', '🥈', '🥉'];
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="lb-rank">${medals[i] || (i + 1)}</span>
+                    <span class="lb-name">${entry.user}</span>
+                    <span style="font-size:0.78em;color:var(--text-muted)">${entry.game}</span>
+                    <span class="lb-score">${entry.score}</span>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        updateLeaderboard();
+
+        // ====== THEME TOGGLE ======
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const btn = document.getElementById('themeToggle');
+            document.body.style.background = document.body.style.background === 'rgb(240, 240, 245)' ? 'var(--bg-deep)' : '#f0f0f5';
+            btn.textContent = btn.textContent === '🌙' ? '☀️' : '🌙';
+        });
+    </script>
+</body>
+
+</html>

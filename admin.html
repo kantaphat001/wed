@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineStream - Admin Management</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #141414;
+            margin: 0;
+            color: #fff;
+        }
+
+        .navbar {
+            background: #000;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #222;
+        }
+
+        .navbar h2 {
+            color: #E50914;
+            margin: 0;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .container {
+            padding: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1f1f1f;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+
+        th {
+            background-color: #333;
+            color: #E50914;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="navbar">
+        <h2>🛠️ CineStream Admin Panel</h2>
+        <button class="logout-btn" onclick="logout()">ออกจากระบบ</button>
+    </div>
+
+    <div class="container">
+        <h3>📋 รายชื่อสมาชิกและวันหมดอายุในระบบคลาวด์</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ชื่อผู้ใช้ (Username)</th>
+                    <th>ระดับสิทธิ์ (Role)</th>
+                    <th>วันหมดอายุรายเดือน</th>
+                </tr>
+            </thead>
+            <tbody id="userTable"></tbody>
+        </table>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Admin Security Check 
+        const role = sessionStorage.getItem("role");
+        if (role !== 'admin') { window.location.href = "login.html"; }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFEtV8TXQVgTvTIPkLR-fim7XhefX-UZ0",
+            authDomain: "users-f969e.firebaseapp.com",
+            projectId: "users-f969e",
+            storageBucket: "users-f969e.firebasestorage.app",
+            messagingSenderId: "482540548425",
+            appId: "1:482540548425:web:faaf509415004a5109ea98"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // โหลดข้อมูลแสดงผลตาราง
+        db.collection("users").get().then((querySnapshot) => {
+            const table = document.getElementById("userTable");
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const d = new Date(data.expireDate);
+                const thaiFormat = d.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+                table.innerHTML += `<tr><td><strong>${data.username}</strong></td><td>${data.role}</td><td>📅 ${thaiFormat}</td></tr>`;
+            });
+        });
+
+        function logout() { sessionStorage.clear(); window.location.href = "login.html"; }
+    </script>
+</body>
+
+</html>
